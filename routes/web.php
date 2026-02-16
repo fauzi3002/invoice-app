@@ -20,11 +20,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/struk/{id}/export-excel', [StrukController::class, 'exportExcel'])
-    ->name('struk.export.excel');
     Route::resource('produk', ProdukController::class);
     Route::resource('pengaturan_toko', PengaturanTokoController::class);
-    Route::post('/pengaturan_toko', [PengaturanTokoController::class, 'update'])->name('pengaturan_toko.update');
     Route::resource('buat_struk', StrukController::class);
     Route::resource('dashboard', DashboardController::class);
 });
