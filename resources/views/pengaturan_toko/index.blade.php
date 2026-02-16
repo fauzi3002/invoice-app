@@ -10,7 +10,7 @@
         </div>
     </div>
 
-    <form action="{{ route('pengaturan_toko.update') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('pengaturan_toko.update', $toko->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         <div class="bg-white rounded-2xl border border-gray-200 mb-4 overflow-hidden">
