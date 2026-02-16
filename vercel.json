@@ -1,21 +1,24 @@
 {
     "version": 2,
-    "framework": null,
     "functions": {
-        "api/index.php": { "runtime": "vercel-php@0.7.1" }
+        "api/index.php": {
+            "runtime": "vercel-php@0.7.5"
+        }
     },
     "routes": [
-        { "src": "/build/(.*)", "dest": "/public/build/" },
-        { "src": "/(.*)", "dest": "/api/index.php" }
+        {
+            "src": "/build/(.*)",
+            "dest": "/public/build/$1"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/api/index.php"
+        }
     ],
-    "public": true,
-    "buildCommand": "vite build",
-    "outputDirectory": "public",
     "env": {
         "APP_ENV": "production",
         "APP_DEBUG": "false",
         "APP_URL": "https://invoice-app.vercel.app",
-        "APP_KEY": "base64:E1Qe01r+LzQSy5hhfsY5cl7vSG76hKBOYGq/E87vOFU=",
         "APP_CONFIG_CACHE": "/tmp/config.php",
         "APP_EVENTS_CACHE": "/tmp/events.php",
         "APP_PACKAGES_CACHE": "/tmp/packages.php",
@@ -25,11 +28,6 @@
         "CACHE_DRIVER": "array",
         "LOG_CHANNEL": "stderr",
         "SESSION_DRIVER": "cookie",
-        "DB_CONNECTION": "pgsql",
-        "DB_HOST": "db.emburoyqgiulhpuziztw.supabase.co",
-        "DB_PORT": "5432",
-        "DB_DATABASE": "postgres",
-        "DB_USERNAME": "postgres",
-        "DB_PASSWORD": "tokorotibapakumar"
+        "DB_CONNECTION": "pgsql"
     }
 }
