@@ -12,7 +12,7 @@
 
     <form action="{{ route('pengaturan_toko.update', $toko->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
-
+        @method('PUT')
         <div class="bg-white rounded-2xl border border-gray-200 mb-4 overflow-hidden">
             <div class="p-6 border-b border-gray-100 bg-gray-50">
                 <h2 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
