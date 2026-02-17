@@ -21,7 +21,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::resource('produk', ProdukController::class);
-    Route::resource('pengaturan_toko', PengaturanTokoController::class);
+    // Hapus baris: Route::resource('pengaturan_toko', PengaturanTokoController::class);
+
+// Ganti dengan ini:
+Route::prefix('pengaturan_toko')->name('pengaturan_toko.')->group(function () {
+    Route::get('/', [PengaturanTokoController::class, 'index'])->name('index');
+    Route::put('/{id}', [PengaturanTokoController::class, 'update'])->name('update');
+});
     Route::resource('buat_struk', StrukController::class);
     Route::resource('dashboard', DashboardController::class);
 });
