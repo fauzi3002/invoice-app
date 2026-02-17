@@ -12,11 +12,12 @@ class PengaturanTokoController extends Controller
      * Tampilkan halaman pengaturan toko
      */
     public function index()
-    {
-        $toko = PengaturanToko::first(); // hanya 1 data
+{
+    // Mengambil data pertama, jika tidak ada, buat objek kosong baru (bukan null)
+    $toko = PengaturanToko::first() ?? new PengaturanToko;
 
-        return view('pengaturan_toko.index', compact('toko'));
-    }
+    return view('pengaturan_toko.index', compact('toko'));
+}
 
     /**
      * Simpan / Update pengaturan toko
