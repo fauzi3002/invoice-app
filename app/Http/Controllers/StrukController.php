@@ -30,10 +30,11 @@ class StrukController extends Controller
         return view('buat_struk.create', compact('produk', 'struks'));
     }
 
-    public function show($id)
+public function show($id)
 {
     $struk = Struk::with(['items.produk'])->findOrFail($id);
-    $toko = PengaturanToko::first();
+    // Mengambil data pertama, jika tidak ada tetap kirim objek kosong agar tidak error property on null
+    $toko = PengaturanToko::first() ?? new PengaturanToko(); 
 
     return view('buat_struk.show', compact('struk', 'toko'));
 }
