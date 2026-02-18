@@ -98,9 +98,18 @@
             </div>
         @empty
             <div class="bg-white rounded-lg border border-gray-200 border-dashed p-12 text-center">
-                <p class="text-gray-400 text-sm italic">Data tidak ditemukan.</p>
+                <p class="text-gray-400 text-sm italic">Belum ada data struk.</p>
             </div>
         @endforelse
+
+        {{-- Pesan pencarian tidak ditemukan (Mobile) --}}
+        <div id="emptySearchMobile" style="display: none;"
+            class="bg-white rounded-lg border border-gray-200 border-dashed p-12 text-center">
+            <p class="text-gray-400 text-sm italic">
+                Data tidak ditemukan.
+            </p>
+        </div>
+
     </div>
 
     {{-- DESKTOP VIEW (Table) --}}
@@ -158,8 +167,78 @@
                         </td>
                     </tr>
                 @endforeach
+
+                {{-- Pesan pencarian tidak ditemukan (Desktop) --}}
+                <tr id="emptySearchDesktop" style="display: none;">
+                    <td colspan="7" class="px-6 py-12 text-center text-gray-400 italic text-sm">
+                        Data tidak ditemukan.
+                    </td>
+                </tr>
+
             </tbody>
         </table>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const searchInput = document.getElementById('searchInput');
+    const emptyMobile = document.getElementById('emptySearchMobile');
+    const emptyDesktop = document.getElementById('emptySearchDesktop');
+
+    if (!searchInput) return;
+
+    searchInput.addEventListener('input', function () {
+
+        const searchTerm = this.value.toLowerCase().trim();
+
+        const desktopRows = document.querySelectorAll('.struk-row');
+        const mobileCards = document.querySelectorAll('.struk-card');
+
+        let desktopMatch = 0;
+        let mobileMatch = 0;
+
+        // ===== DESKTOP =====
+        desktopRows.forEach(row => {
+            const name = row.dataset.nama || '';
+            const match = name.includes(searchTerm);
+
+            row.style.display = match ? '' : 'none';
+
+            if (match) desktopMatch++;
+        });
+
+        // ===== MOBILE =====
+        mobileCards.forEach(card => {
+            const name = card.dataset.nama || '';
+            const match = name.includes(searchTerm);
+
+            card.style.display = match ? '' : 'none';
+
+            if (match) mobileMatch++;
+        });
+
+        // ===== EMPTY MESSAGE CONTROL =====
+
+        if (searchTerm !== '' && desktopMatch === 0 && desktopRows.length > 0) {
+            emptyDesktop.style.display = 'table-row';
+        } else {
+            emptyDesktop.style.display = 'none';
+        }
+
+        if (searchTerm !== '' && mobileMatch === 0 && mobileCards.length > 0) {
+            emptyMobile.style.display = 'block';
+        } else {
+            emptyMobile.style.display = 'none';
+        }
+
+    });
+
+});
+</script>
+@endpush
+
+
 @endsection

@@ -96,6 +96,13 @@
                 <p class="text-gray-400 text-sm italic">Produk tidak ditemukan.</p>
             </div>
         @endforelse
+            {{-- Pesan pencarian tidak ditemukan (Mobile) --}}
+            <div id="emptySearchMobile" style="display: none;"
+                class="bg-white rounded-lg border border-gray-200 border-dashed p-12 text-center">
+                <p class="text-gray-400 text-sm italic">
+                    Data tidak ditemukan.
+                </p>
+            </div>
     </div>
 
     {{-- DESKTOP VIEW (Table) --}}
@@ -157,6 +164,13 @@
                         </td>
                     </tr>
                 @endforeach
+
+                {{-- Pesan pencarian tidak ditemukan (Desktop) --}}
+                <tr id="emptySearchDesktop" style="display: none;">
+                    <td colspan="7" class="px-6 py-12 text-center text-gray-400 italic text-sm">
+                        Data tidak ditemukan.
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -166,23 +180,58 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+
     const searchInput = document.getElementById('searchInput');
     const productCards = document.querySelectorAll('.product-card');
     const productRows = document.querySelectorAll('.product-row');
+    const emptyMobile = document.getElementById('emptySearchMobile');
+    const emptyDesktop = document.getElementById('emptySearchDesktop');
+
+    if (!searchInput) return;
 
     searchInput.addEventListener('input', function () {
-        const keyword = this.value.toLowerCase();
 
-        // Filter Mobile
+        const keyword = this.value.toLowerCase().trim();
+
+        let mobileMatch = 0;
+        let desktopMatch = 0;
+
+        // ===== MOBILE FILTER =====
         productCards.forEach(card => {
-            card.classList.toggle('hidden', !card.dataset.nama.includes(keyword));
+            const name = card.dataset.nama || '';
+            const match = name.includes(keyword);
+
+            card.style.display = match ? '' : 'none';
+
+            if (match) mobileMatch++;
         });
 
-        // Filter Desktop
+        // ===== DESKTOP FILTER =====
         productRows.forEach(row => {
-            row.classList.toggle('hidden', !row.dataset.nama.includes(keyword));
+            const name = row.dataset.nama || '';
+            const match = name.includes(keyword);
+
+            row.style.display = match ? '' : 'none';
+
+            if (match) desktopMatch++;
         });
+
+        // ===== EMPTY MESSAGE CONTROL =====
+
+        if (keyword !== '' && mobileMatch === 0 && productCards.length > 0) {
+            emptyMobile.style.display = 'block';
+        } else {
+            emptyMobile.style.display = 'none';
+        }
+
+        if (keyword !== '' && desktopMatch === 0 && productRows.length > 0) {
+            emptyDesktop.style.display = 'table-row';
+        } else {
+            emptyDesktop.style.display = 'none';
+        }
+
     });
+
 });
 </script>
 @endpush
