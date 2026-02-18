@@ -72,16 +72,16 @@
                                     <h1 class="product-name font-bold text-gray-800">{{ $p->nama_produk }}</h1>
                                     <div class="flex items-center gap-3 mt-1">
                                         <span class="text-sm text-blue-600 font-bold font-mono">Rp {{ number_format($p->harga_satuan, 0, ',', '.') }}</span>
-                                        <span class="text-[10px] uppercase font-black px-2 py-0.5 rounded border {{ $p->stok <= 0 ? 'bg-red-50 text-red-600 border-red-100' : 'bg-gray-50 text-gray-400 border-gray-200' }}">
-                                            Stok: <span class="stock-number">{{ $p->stok }}</span>
-                                        </span>
                                     </div>
+                                    <span class="text-[10px] uppercase font-black px-2 py-0.5 rounded border {{ $p->stok <= 0 ? 'bg-red-50 text-red-600 border-red-100' : 'bg-gray-50 text-gray-400 border-gray-200' }}">
+                                            Stok: <span class="stock-number">{{ $p->stok }}</span>
+                                    </span>
                                 </div>
 
-                                <div class="flex items-center gap-3 bg-white p-1 rounded-lg border border-gray-200">
+                                <div class="flex items-center bg-white rounded-lg border border-gray-200">
                                     <button type="button" class="btn-minus w-8 h-8 flex items-center justify-center bg-gray-100 text-gray-600 rounded-md hover:bg-red-500 hover:text-white transition font-bold">-</button>
                                     <input type="number" name="items[{{ $p->id }}][qty]" value="{{ $qty }}" min="0" 
-                                           class="product-qty w-16 text-center font-bold text-sm text-gray-800 outline-none bg-white border-none focus:ring-0 appearance-none" style="-moz-appearance: textfield;">
+                                           class="product-qty w-12 text-center font-bold text-sm text-gray-800 outline-none bg-white border-none focus:ring-0 appearance-none" style="-moz-appearance: textfield;">
                                     <input type="hidden" name="items[{{ $p->id }}][price]" value="{{ $p->harga_satuan }}">
                                     <button type="button" class="btn-plus w-8 h-8 flex items-center justify-center bg-gray-100 text-gray-600 rounded-md hover:bg-blue-600 hover:text-white transition font-bold">+</button>
                                 </div>
