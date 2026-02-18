@@ -1,116 +1,118 @@
 @extends('layouts.app')
 
 @section('content')
-<div id="pageWrapper" class="pb-40 md:pb-24 min-h-screen">
+<div id="pageWrapper" class="pb-40 md:pb-24 min-h-screen max-w-full mx-auto px-4 md:px-0">
     <form method="POST" action="{{ route('buat_struk.store') }}" id="createStrukForm">
         @csrf
         @method('POST')
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        
+        {{-- Header --}}
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
             <div>
-                <h2 class="text-2xl font-semibold text-gray-800">Buat Struk</h2>
+                <h2 class="text-2xl font-bold text-gray-800 tracking-tight">Buat Struk</h2>
                 <p class="text-sm text-gray-500 mt-1">Buat struk pembayaran untuk pelanggan Anda</p>
             </div>
         </div>
 
-        <div class="mb-4">
-            <button type="button" id="openModalBtn" class="px-6 py-6 bg-gray-50 w-full border-blue-900 border-2 border-dashed text-blue-900 font-medium rounded-xl hover:bg-blue-100 transition">
-                Pilih Produk
+        {{-- Button Pilih Produk --}}
+        <div class="mb-6">
+            <button type="button" id="openModalBtn" class="px-6 py-8 bg-gray-50 w-full border-gray-200 border-2 border-dashed text-blue-900 font-bold rounded-lg hover:bg-blue-50 hover:border-blue-300 transition group">
+                <div class="flex flex-col items-center gap-2">
+                    <span class="bg-blue-900 text-white p-2 rounded-lg group-hover:scale-110 transition">+</span>
+                    PILIH PRODUK DARI DAFTAR
+                </div>
             </button>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 mb-4">
-            <div class="p-6 border-b border-gray-100 bg-gray-50">
-                <h2 class="text-lg font-semibold text-gray-800">Informasi Pelanggan</h2>
+        {{-- Form Informasi Pelanggan --}}
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 overflow-hidden">
+            <div class="p-5 border-b border-gray-200 bg-gray-50">
+                <h2 class="text-xs font-black text-gray-500 uppercase tracking-widest">Informasi Pelanggan</h2>
             </div>
             <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-2">
-                    <label class="text-sm font-semibold text-gray-700">Nama Pelanggan</label>
-                    <input name="customer_name" type="text" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-blue-100 focus:border-blue-400 outline-none transition" placeholder="Masukan nama pelanggan" required>
+                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Nama Pelanggan</label>
+                    <input name="customer_name" type="text" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:ring-4 focus:ring-blue-100 focus:border-blue-400 outline-none transition placeholder:text-gray-300" placeholder="Contoh: Budi Santoso" required>
                 </div>
                 <div class="space-y-2">
-                    <label class="text-sm font-semibold text-gray-700">No. Telp</label>
-                    <input name="customer_phone" type="text" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-blue-100 focus:border-blue-400 outline-none transition" placeholder="0812xxxx" required>
+                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">No. Telp</label>
+                    <input name="customer_phone" type="text" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:ring-4 focus:ring-blue-100 focus:border-blue-400 outline-none transition placeholder:text-gray-300" placeholder="0812xxxx" required>
                 </div>
                 <div class="md:col-span-2 space-y-2">
-                    <label class="text-sm font-semibold text-gray-700">Alamat</label>
-                    <textarea name="customer_address" rows="3" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-blue-100 focus:border-blue-400 outline-none transition resize-none" placeholder="Masukan alamat pelanggan" required></textarea>
+                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Alamat</label>
+                    <textarea name="customer_address" rows="3" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:ring-4 focus:ring-blue-100 focus:border-blue-400 outline-none transition resize-none placeholder:text-gray-300" placeholder="Masukan alamat lengkap" required></textarea>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 mb-4 p-6 mt-6">
-            <div class="hidden  mb-2 space-y-2">
+        {{-- Pembayaran --}}
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6">
+            <div class="hidden mb-2 space-y-2">
                 <label class="text-sm font-semibold text-gray-700">Status:</label>
-                <select name="status" id="paymentStatus" class="ml-2 px-4 py-2 w-full border border-gray-200 rounded-lg focus:ring-4 focus:ring-blue-100 focus:border-blue-400 outline-none transition" required>
-                    <option value="pending">-- Pilih Status --</option>
+                <select name="status" id="paymentStatus" class="ml-2 px-4 py-2 w-full border border-gray-200 rounded-lg outline-none transition" required>
                     <option value="pending">Pending</option>
                     <option value="partial">Partial</option>
                     <option value="lunas">Lunas</option>
                 </select>
             </div>
-            <div class="mb-2 space-y-2">
-                <label class="text-sm font-semibold text-gray-700">Jumlah Bayar</label>
-                <input name="amount_paid" type="number" id="amountPaid" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-blue-100 focus:border-blue-400 outline-none transition" placeholder="Masukan jumlah bayar" value="0">
+            <div class="space-y-2">
+                <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Jumlah Bayar (Rp)</label>
+                <input name="amount_paid" type="number" id="amountPaid" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:ring-4 focus:ring-blue-100 focus:border-blue-400 outline-none transition font-bold text-blue-900" placeholder="0" value="0">
             </div>
         </div>
 
-        <div id="productModal"
-     class="fixed inset-0 
-       md:left-64 
-       md:bottom-24
-       bg-black/50 backdrop-blur-sm 
-       hidden items-center justify-center z-50"
-        >
-
-            <div class="bg-white w-full h-full md:h-[90%] md:w-[90%] md:rounded-2xl shadow-xl flex flex-col">
-                <div class="flex items-center justify-between p-5 border-b">
-                    <h2 class="text-xl font-semibold">Pilih Produk</h2>
-                    <button type="button" id="closeModalBtn" class="text-2xl hover:text-red-500">&times;</button>
+        {{-- MODAL PRODUK --}}
+        <div id="productModal" class="fixed inset-0 md:left-64 bg-gray-900/60 backdrop-blur-sm hidden items-center justify-center z-[60]">
+            <div class="bg-white w-full h-full md:h-[85%] md:w-[80%] md:rounded-lg shadow-2xl flex flex-col border border-gray-200 overflow-hidden mx-4">
+                <div class="flex items-center justify-between p-5 border-b border-gray-200">
+                    <h2 class="text-lg font-bold text-gray-800 uppercase tracking-tight">Pilih Produk</h2>
+                    <button type="button" id="closeModalBtn" class="text-3xl text-gray-400 hover:text-red-500 transition">&times;</button>
                 </div>
 
-                <div class="mt-2 p-6 border-b border-gray-200">
-                    <input type="search" id="searchProduct" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-4 focus:ring-blue-100 focus:border-blue-400 outline-none transition" placeholder="Cari produk...">
+                <div class="p-5 border-b border-gray-100 bg-gray-50/50">
+                    <input type="search" id="searchProduct" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:ring-4 focus:ring-blue-100 focus:border-blue-400 outline-none transition text-sm" placeholder="Cari berdasarkan nama produk...">
                 </div>
 
-                <div id="modalBody" class="p-6 overflow-y-auto flex-1">
-                    <div>
-                        @foreach ($produk as $p)
-                            <div class="product-item flex justify-between items-center border-b border-gray-200 p-2" data-price="{{ $p->harga_satuan }}" data-id="{{ $p->id }}" data-stock="{{ $p->stok }}">
-                                <div>
-                                    <h1 class="product-name">{{ $p->nama_produk }}</h1>
-                                    <span class="text-sm text-blue-500 font-semibold">Rp {{ number_format($p->harga_satuan, 0, ',', '.') }}</span>
-                                    <span class="text-xs product-stock {{ $p->stok <= 0 ? 'text-red-500' : 'text-gray-400' }}">
+                <div id="modalBody" class="p-6 overflow-y-auto flex-1 space-y-2">
+                    @foreach ($produk as $p)
+                        <div class="product-item flex justify-between items-center border border-gray-100 p-4 rounded-lg hover:bg-gray-50 transition shadow-sm" data-price="{{ $p->harga_satuan }}" data-id="{{ $p->id }}" data-stock="{{ $p->stok }}">
+                            <div class="flex flex-col">
+                                <h1 class="product-name font-bold text-gray-800">{{ $p->nama_produk }}</h1>
+                                <div class="flex items-center gap-3 mt-1">
+                                    <span class="text-sm text-blue-600 font-bold font-mono">Rp {{ number_format($p->harga_satuan, 0, ',', '.') }}</span>
+                                    <span class="text-[10px] uppercase font-black px-2 py-0.5 rounded border {{ $p->stok <= 0 ? 'bg-red-50 text-red-600 border-red-100' : 'bg-gray-50 text-gray-400 border-gray-200' }}">
                                         Stok: <span class="stock-number">{{ $p->stok }}</span>
                                     </span>
                                 </div>
-
-                                <div class="flex items-center gap-2">
-                                    <button type="button" class="btn-minus px-3 py-1 bg-red-500 text-white rounded-lg">-</button>
-                                    <input type="number" name="items[{{ $p->id }}][qty]" value="0" min="0" class="product-qty w-12 px-1 py-1 bg-gray-50 border rounded-lg text-center">
-                                    <input type="hidden" name="items[{{ $p->id }}][price]" value="{{ $p->harga_satuan }}">
-                                    <button type="button" class="btn-plus px-3 py-1 bg-blue-500 text-white rounded-lg">+</button>
-                                </div>
                             </div>
-                        @endforeach
-                    </div>
+
+                            <div class="flex items-center gap-3 bg-white p-1 rounded-lg border border-gray-200">
+                                <button type="button" class="btn-minus w-8 h-8 flex items-center justify-center bg-gray-100 text-gray-600 rounded-md hover:bg-red-500 hover:text-white transition font-bold">-</button>
+                                {{-- Ganti baris input Anda dengan ini --}}
+<input type="number" 
+       name="items[{{ $p->id }}][qty]" 
+       value="0" 
+       min="0" 
+       class="product-qty w-16 text-center font-bold text-sm text-gray-800 outline-none bg-white border-none focus:ring-0 appearance-none" 
+       style="-moz-appearance: textfield;">
+                                <input type="hidden" name="items[{{ $p->id }}][price]" value="{{ $p->harga_satuan }}">
+                                <button type="button" class="btn-plus w-8 h-8 flex items-center justify-center bg-gray-100 text-gray-600 rounded-md hover:bg-blue-600 hover:text-white transition font-bold">+</button>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </div>
 
-        <div id="cartBar"
-     class="fixed bottom-0 left-0 right-0 md:left-64 bg-white border-t shadow-xl p-4 z-50">
-
-            <div class="flex items-center justify-between">
-                <div>
-                    <span id="cartTotalItem" class="text-sm font-semibold text-gray-700">0 Item</span>
+        {{-- STICKY CART BAR --}}
+        <div id="cartBar" class="fixed bottom-0 left-0 right-0 md:left-64 bg-white border-t border-gray-200 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)] p-5 z-50">
+            <div class="max-w-7xl mx-auto flex items-center justify-between">
+                <div class="flex flex-col">
+                    <span id="cartTotalItem" class="text-[10px] font-black uppercase text-gray-400 tracking-widest">0 Item Terpilih</span>
+                    <span id="cartTotalPrice" class="text-xl font-black text-blue-900 tracking-tight">Rp 0</span>
                 </div>
-                <div>
-                    <span id="cartTotalPrice" class="text-lg font-bold text-blue-900">Rp 0</span>
-                </div>
-
-            <div class="justify-end flex mt-4">
-                <button type="submit" id="mainSubmitBtn" class="px-8 py-3 bg-blue-900 text-center text-white rounded-lg font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 hover:shadow-blue-300 transition active:scale-95">
-                    Simpan
+                <button type="submit" id="mainSubmitBtn" class="px-10 py-3 bg-blue-900 text-white rounded-lg font-bold uppercase text-xs tracking-widest shadow-lg shadow-blue-200 hover:bg-blue-800 transition active:scale-95">
+                    Simpan Struk
                 </button>
             </div>
         </div>
