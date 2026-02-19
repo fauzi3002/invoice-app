@@ -56,7 +56,8 @@
                     ['route' => 'dashboard.index', 'icon' => 'M3 13h1v7c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-7h1a1 1 0 0 0 .707-1.707l-9-9a.999.999 0 0 0-1.414 0l-9 9A1 1 0 0 0 3 13zm7 7v-5h4v5h-4zm2-15.586 6 6V13l.001 7H16v-5c0-1.103-.897-2-2-2h-4c-1.103 0-2 .897-2 2v5H5v-9.586l6-6z', 'label' => 'Dashboard', 'active' => 'dashboard'],
                     ['route' => 'produk.index', 'icon' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', 'label' => 'Produk', 'active' => 'produk.*', 'is_svg_path' => true],
                     ['route' => 'buat_struk.create', 'icon' => 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z', 'label' => 'Buat Struk', 'active' => 'buat_struk.create'],
-                    ['route' => 'notification.index', 'icon' => 'M12 22c1.104 0 2-.896 2-2h-4c0 1.104.896 2 2 2zm6-6V11c0-3.07-1.64-5.64-4.5-6.32V4a1.5 1.5 0 10-3 0v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z', 'label' => 'Notification', 'active' => 'notification.index'],
+                    ['route' => 'buat_struk.index', 'icon' => 'M18 17H6v-2h12v2zm0-4H6v-2h12v2zm0-4H6V7h12v2zM3 22l1.5-1.5L6 22l1.5-1.5L9 22l1.5-1.5L12 22l1.5-1.5L15 22l1.5-1.5L18 22l1.5-1.5L21 22V2l-1.5 1.5L18 2l-1.5 1.5L15 2l-1.5 1.5L12 2l-1.5 1.5L9 2l-1.5 1.5L6 2l-1.5 1.5L3 2v20z', 'label' => 'Daftar Struk', 'active' => 'buat_struk.index'],
+                    ['route' => 'buat_struk.index', 'icon' => 'M18 17H6v-2h12v2zm0-4H6v-2h12v2zm0-4H6V7h12v2zM3 22l1.5-1.5L6 22l1.5-1.5L9 22l1.5-1.5L12 22l1.5-1.5L15 22l1.5-1.5L18 22l1.5-1.5L21 22V2l-1.5 1.5L18 2l-1.5 1.5L15 2l-1.5 1.5L12 2l-1.5 1.5L9 2l-1.5 1.5L6 2l-1.5 1.5L3 2v20z', 'label' => 'Daftar Struk', 'active' => 'buat_struk.index'],
                 ];
             @endphp
 

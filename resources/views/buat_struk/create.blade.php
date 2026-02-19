@@ -18,7 +18,7 @@
         <div class="mb-6">
             <button type="button" id="openModalBtn" class="px-6 py-8 bg-gray-50 w-full border-gray-200 border-2 border-dashed text-blue-900 font-bold rounded-lg hover:bg-blue-50 hover:border-blue-300 transition group">
                 <div class="flex flex-col items-center gap-2">
-                    <span class="bg-blue-900 text-white p-2 rounded-lg group-hover:scale-110 transition">+</span>
+                    <span class="bg-blue-900 text-white px-2 py-1 rounded-lg group-hover:scale-110 transition">+</span>
                     PILIH PRODUK DARI DAFTAR
                 </div>
             </button>
