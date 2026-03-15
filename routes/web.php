@@ -33,6 +33,13 @@ Route::middleware('auth')->group(function () {
     Route::resource('buat_struk', StrukController::class);
     Route::resource('dashboard', DashboardController::class);
     Route::resource('notification', NotificationController::class);
+    Route::get('/settings/whatsapp', [App\Http\Controllers\StrukController::class, 'whatsappSettings'])->name('settings.whatsapp');
+    Route::post('/generate-struk', [StrukController::class, 'generateOnly'])->name('struk.generate');
+    // Menampilkan halaman prepare
+    Route::get('/whatsapp-prepare/{id}', [StrukController::class, 'prepare'])->name('whatsapp.prepare');
+
+    // Eksekusi pengiriman (Action)
+    Route::post('/whatsapp-send', [StrukController::class, 'send'])->name('whatsapp.send');
 });
 
 require __DIR__.'/auth.php';

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div id="pageWrapper" class="pb-24 max-w-full mx-auto px-4">
+<div id="pageWrapper" class="container mx-auto px-4 pt-20 md:pt-6 pb-24">
     {{-- HEADER SECTION --}}
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
         <div>
@@ -70,7 +70,7 @@
                 <div class="p-3 bg-gray-50/50 border-t border-gray-100 flex gap-2">
                     <a href="{{ route('buat_struk.show', $struk->id) }}" class="flex-1 bg-white py-2 rounded-lg border border-gray-200 text-center text-xs font-bold text-gray-600 hover:bg-gray-100 transition">Detail</a>
                     <a href="{{ route('buat_struk.edit', $struk->id) }}" class="flex-1 bg-white py-2 rounded-lg border border-gray-200 text-center text-xs font-bold text-blue-600 hover:bg-blue-50 transition">Edit</a>
-                    <button @click="openModal = true; deleteUrl = '{{ route('buat_struk.destroy', $struk->id) }}'; customerName = '{{ $struk->nama_pelanggan }}'"
+                    <button onclick="confirmDelete('{{ route('buat_struk.destroy', $struk->id) }}')"
                             class="flex-1 bg-white py-2 rounded-lg border border-gray-200 text-center text-xs font-bold text-red-600 hover:bg-red-50 transition">
                         Hapus
                     </button>
@@ -159,8 +159,12 @@
                                 </a>
                                 <form action="{{ route('buat_struk.destroy', $struk->id) }}" method="POST" onsubmit="return confirm('Hapus struk ini?')">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="p-2 text-gray-400 hover:text-red-600 transition-colors" title="Hapus">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                    <button type="button" 
+                                            onclick="confirmDelete('{{ route('buat_struk.destroy', $struk->id) }}')"
+                                            class="p-2 text-gray-400 hover:text-red-600 transition duration-200">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        </svg>
                                     </button>
                                 </form>
                             </div>
@@ -193,15 +197,89 @@
             </tbody>
         </table>
     </div>
+
+    {{-- MODAL KONFIRMASI HAPUS --}}
+    <div id="deleteModal" class="fixed inset-0 z-[99] hidden items-center justify-center p-4">
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"></div>
+
+        <div class="relative bg-white rounded-xl shadow-xl max-w-sm w-full overflow-hidden border border-gray-200 transform transition-all">
+            <div class="p-6 text-center">
+                <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Konfirmasi Hapus</h3>
+                <p class="text-sm text-gray-500 mb-6">Apakah Anda yakin ingin menghapus produk ini? Data yang dihapus tidak dapat dikembalikan.</p>
+
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeDeleteModal()" 
+                            class="flex-1 px-4 py-2.5 bg-gray-100 text-gray-600 rounded-lg text-sm font-bold hover:bg-gray-200 transition">
+                        Batal
+                    </button>
+                    
+                    <form id="deleteForm" method="POST" class="flex-1">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" id="btnConfirmDelete"
+                                class="w-full px-4 py-2.5 bg-red-600 text-white rounded-lg text-sm font-bold hover:bg-red-700 shadow-md shadow-red-200 transition active:scale-95">
+                            Ya, Hapus
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 @push('scripts')
 <script>
+    
+    function confirmDelete(url) {
+        const modal = document.getElementById('deleteModal');
+        const deleteForm = document.getElementById('deleteForm');
+        const btnDelete = document.getElementById('btnConfirmDelete');
+        
+        // Reset state tombol (jika sebelumnya pernah terbuka)
+        btnDelete.classList.remove('btn-loading');
+        btnDelete.disabled = false;
+
+        deleteForm.action = url;
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // Tambahkan logika loading saat form hapus dikirim
+    const deleteForm = document.getElementById('deleteForm');
+    const btnDelete = document.getElementById('btnConfirmDelete');
+
+    deleteForm.onsubmit = function() {
+        // Tambahkan class loading dan disable tombol
+        btnDelete.classList.add('btn-loading');
+        btnDelete.disabled = true;
+        
+        // Tombol "Batal" juga sebaiknya di-disable agar user tidak menutup modal saat proses
+        const btnCancel = document.querySelector('button[onclick="closeDeleteModal()"]');
+        if(btnCancel) btnCancel.disabled = true;
+
+        return true;
+    };
+
+    function closeDeleteModal() {
+        const modal = document.getElementById('deleteModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.style.overflow = 'auto';
+    }
 document.addEventListener('DOMContentLoaded', function () {
 
     const searchInput = document.getElementById('searchInput');
     const emptyMobile = document.getElementById('emptySearchMobile');
     const emptyDesktop = document.getElementById('emptySearchDesktop');
+    const modal = document.getElementById('deleteModal');
 
     if (!searchInput) return;
 

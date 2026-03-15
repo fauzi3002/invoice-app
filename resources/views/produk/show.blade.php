@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="pb-24 max-w-full mx-auto px-4" x-data="{ openModal: false, deleteUrl: '', productName: '' }">
+<div class="container mx-auto px-4 pt-20 md:pt-6 pb-24" x-data="{ openModal: false, deleteUrl: '', productName: '' }">
 
     {{-- Header --}}
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">

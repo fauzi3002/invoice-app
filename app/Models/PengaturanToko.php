@@ -11,6 +11,7 @@ class PengaturanToko extends Model
     protected $fillable = [
         'nama_toko',
         'logo_toko',
+        'tanda_tangan',
         'no_telepon',
         'email',
         'nama_bank',

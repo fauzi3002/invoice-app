@@ -57,7 +57,6 @@
                     ['route' => 'produk.index', 'icon' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', 'label' => 'Produk', 'active' => 'produk.*', 'is_svg_path' => true],
                     ['route' => 'buat_struk.create', 'icon' => 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z', 'label' => 'Buat Struk', 'active' => 'buat_struk.create'],
                     ['route' => 'buat_struk.index', 'icon' => 'M18 17H6v-2h12v2zm0-4H6v-2h12v2zm0-4H6V7h12v2zM3 22l1.5-1.5L6 22l1.5-1.5L9 22l1.5-1.5L12 22l1.5-1.5L15 22l1.5-1.5L18 22l1.5-1.5L21 22V2l-1.5 1.5L18 2l-1.5 1.5L15 2l-1.5 1.5L12 2l-1.5 1.5L9 2l-1.5 1.5L6 2l-1.5 1.5L3 2v20z', 'label' => 'Daftar Struk', 'active' => 'buat_struk.index'],
-                    ['route' => 'buat_struk.index', 'icon' => 'M18 17H6v-2h12v2zm0-4H6v-2h12v2zm0-4H6V7h12v2zM3 22l1.5-1.5L6 22l1.5-1.5L9 22l1.5-1.5L12 22l1.5-1.5L15 22l1.5-1.5L18 22l1.5-1.5L21 22V2l-1.5 1.5L18 2l-1.5 1.5L15 2l-1.5 1.5L12 2l-1.5 1.5L9 2l-1.5 1.5L6 2l-1.5 1.5L3 2v20z', 'label' => 'Daftar Struk', 'active' => 'buat_struk.index'],
                 ];
             @endphp
 
@@ -88,6 +87,15 @@
                         <span class="text-sm tracking-tight">Pengaturan</span>
                     </a>
                 </div>
+                <!-- <div class="p-1">
+                    <a href="{{ route('settings.whatsapp') }}" wire:navigate
+                    class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 group {{ request()->routeIs('pengaturan_toko.*') ? 'bg-blue-50 text-blue-900 font-bold' : 'hover:bg-gray-50 text-gray-600 hover:text-blue-900' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 {{ request()->routeIs('pengaturan_toko.*') ? 'text-blue-900' : 'text-gray-400 group-hover:text-blue-900' }}" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 16c2.206 0 4-1.794 4-4s-1.794-4-4-4-4 1.794-4 4 1.794 4 4 4zm0-6c1.103 0 2 .897 2 2s-.897 2-2 2-2-.897-2-2 .897-2 2-2z"/><path d="m19.98 10.356-.566-2.465-2.369-.739-.231-.41a7.03 7.03 0 0 0-2.367-2.367l-.41-.231-.739-2.369-2.465-.566-2.465.566-.739 2.369-.41.231a7.03 7.03 0 0 0-2.367 2.367l-.231.41-2.369.739-.566 2.465.566 2.465 2.369.739.231.41a7.03 7.03 0 0 0 2.367 2.367l.41.231.739 2.369 2.465.566 2.465-.566.739-2.369.41-.231a7.03 7.03 0 0 0 2.367-2.367l.231-.41 2.369-.739.566-2.465zM12 19c-3.859 0-7-3.141-7-7s3.141-7 7-7 7 3.141 7 7-3.141 7-7 7z"/>
+                        </svg>
+                        <span class="text-sm tracking-tight">Settings WhatsApp</span>
+                    </a>
+                </div> -->
             </div>
         </nav>
 
@@ -128,7 +136,7 @@
             </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto pt-28 px-6 pb-12">
+        <main class="flex-1 overflow-y-auto pt-6 md:pt-28 px-2 md:px-6 pb-12">
             <div class="w-full">
                 @yield('content')
             </div>

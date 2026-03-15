@@ -1,7 +1,16 @@
 @extends('layouts.app')
-
+<style>
+    #signature-pad {
+        cursor: crosshair;
+        touch-action: none;
+        /* Menghaluskan tampilan canvas secara visual di level browser */
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+        image-rendering: high-quality;
+    }
+</style>
 @section('content')
-<div id="pageWrapper" class="pb-40 md:pb-24 min-h-screen max-w-full mx-auto px-4">
+<div id="pageWrapper" class="container mx-auto px-4 pt-20 md:pt-6 pb-24">
     {{-- Header --}}
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
         <div>
@@ -25,7 +34,7 @@
         </div>
     @endif
 
-    <form action="{{ route('pengaturan_toko.update', $toko->id ?? 1) }}" 
+    <form id="mainForm" action="{{ route('pengaturan_toko.update', $toko->id ?? 1) }}" 
           enctype="multipart/form-data" 
           method="POST" 
           class="space-y-6">
@@ -139,13 +148,59 @@
                     </div>
                 </div>
 
+                {{-- Otorisasi & Tanda Tangan --}}
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <div class="p-5 border-b border-gray-100 flex items-center gap-3">
+                        <div class="p-2 bg-purple-50 rounded-lg">
+                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                        </div>
+                        <h3 class="font-bold text-gray-800">Otorisasi & Tanda Tangan</h3>
+                    </div>
+                    
+                    <div class="p-6" x-data="signatureHandler()">
+                        <div class="space-y-4">
+                            <label class="text-xs font-bold text-gray-600 uppercase tracking-wider">Tanda Tangan Digital</label>
+                            
+                            {{-- Preview Tanda Tangan yang Sudah Ada --}}
+                            <div x-show="existingSig && !isEditing" class="flex flex-col items-center p-6 border-2 border-gray-100 rounded-xl bg-gray-50/50">
+                                <img :src="existingSig" class="max-h-40 mix-blend-multiply" alt="Tanda Tangan">
+                                <button type="button" @click="startEdit()" class="mt-4 text-sm font-bold text-blue-600 hover:text-blue-800 transition">
+                                    Ubah Tanda Tangan
+                                </button>
+                            </div>
+
+                            {{-- Area Canvas Baru --}}
+                            <div x-show="isEditing || !existingSig" x-cloak>
+                                <div class="relative w-full border-2 border-dashed border-gray-300 rounded-xl bg-white overflow-hidden group hover:border-blue-400 transition-colors">
+                                    {{-- Tinggi canvas ditingkatkan ke h-64 untuk ruang lebih besar --}}
+                                    <canvas id="signature-pad" class="w-full h-64 touch-none cursor-crosshair"></canvas>
+                                    
+                                    <div class="absolute bottom-3 right-3 flex gap-2">
+                                        <button type="button" @click="clear()" class="px-3 py-2 bg-white shadow-md rounded-lg text-red-500 hover:bg-red-50 border border-gray-200 transition flex items-center gap-2 text-xs font-bold">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                            Hapus
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between mt-3">
+                                    <p class="text-xs text-gray-400 italic font-medium">Silakan tanda tangan di dalam kotak area putih di atas.</p>
+                                    <button x-show="existingSig" type="button" @click="cancelEdit()" class="text-xs font-bold text-gray-500 hover:text-gray-700">Batal</button>
+                                </div>
+                            </div>
+
+                            {{-- Hidden input untuk dikirim ke Controller --}}
+                            <input type="hidden" name="tanda_tangan" id="tanda_tangan_input">
+                        </div>
+                    </div>
+                </div>
+
                 {{-- Action Buttons --}}
                 <div class="flex items-center justify-end gap-3 pt-2">
                     <a href="{{ route('dashboard.index') }}" 
                        class="px-6 py-2.5 text-sm font-bold text-gray-500 hover:text-gray-700 transition">
                         Batal
                     </a>
-                    <button type="submit" 
+                    <button type="submit" id="btnSubmit"
                             class="px-8 py-2.5 bg-blue-900 text-white rounded-lg text-sm font-bold shadow-md hover:bg-blue-800 focus:ring-4 focus:ring-blue-900/20 transition-all active:scale-95">
                         Simpan Perubahan
                     </button>
@@ -154,4 +209,126 @@
         </div>
     </form>
 </div>
+
+@push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('signatureHandler', () => ({
+        canvas: null,
+        isEditing: false,
+        existingSig: "{{ $toko?->tanda_tangan ? asset('storage/' . $toko->tanda_tangan) : '' }}",
+
+        init() {
+            if (!this.existingSig) {
+                this.$nextTick(() => this.initFabric());
+            }
+        },
+
+        initFabric() {
+            const canvasEl = document.getElementById('signature-pad');
+            
+            // 1. Inisialisasi Canvas dengan Retain Object Stack
+            this.canvas = new fabric.Canvas('signature-pad', {
+                isDrawingMode: true,
+                width: canvasEl.offsetWidth,
+                height: 256,
+                enableRetinaScaling: true, // Super tajam di layar HP/Retina
+                backgroundColor: 'rgba(255,255,255,0)'
+            });
+
+            // 2. KONFIGURASI BRUSH "RAJA KOREKSI"
+            const brush = new fabric.PencilBrush(this.canvas);
+            
+            // Warna & Ketebalan Ramping (Elegan)
+            brush.color = 'rgb(30, 58, 138)'; 
+            brush.width = 1.8; 
+
+            /** * SUPER KOREKSI LEVEL 1: Decimate
+             * Menghapus titik input mouse yang terlalu rapat (penyebab garis bergerigi)
+             */
+            brush.decimate = 8; 
+
+            /**
+             * SUPER KOREKSI LEVEL 2: Shadow Smoothing
+             * Memberikan sedikit glow tipis untuk menyamarkan pixel yang tajam
+             */
+            brush.shadow = new fabric.Shadow({
+                blur: 1,
+                offsetX: 0,
+                offsetY: 0,
+                affectStroke: true,
+                color: 'rgba(30, 58, 138, 0.15)'
+            });
+
+            this.canvas.freeDrawingBrush = brush;
+
+            // 3. SUPER KOREKSI LEVEL 3: Post-Drawing Path Smoothing
+            // Ini adalah rahasia "KTP-el". Setelah mouse dilepas, garis dikoreksi ulang.
+            this.canvas.on('path:created', (options) => {
+                const path = options.path;
+                
+                // Mengurangi jumlah point pada path secara matematis
+                path.set({
+                    strokeLineCap: 'round',
+                    strokeLineJoin: 'round',
+                    strokeMiterLimit: 10,
+                    // Efek visual halus
+                    perPixelTargetFind: true
+                });
+
+                // Render ulang agar garis terlihat 'smooth' seketika
+                this.canvas.renderAll();
+            });
+
+            window.fabricCanvas = this.canvas;
+        },
+
+        startEdit() {
+            this.isEditing = true;
+            this.$nextTick(() => {
+                // Pastikan canvas di-resize ulang jika container berubah
+                const canvasEl = document.getElementById('signature-pad');
+                if(this.canvas) {
+                    this.canvas.setDimensions({
+                        width: canvasEl.offsetWidth,
+                        height: 256
+                    });
+                } else {
+                    this.initFabric();
+                }
+            });
+        },
+
+        clear() {
+            if (this.canvas) {
+                this.canvas.clear();
+                this.canvas.renderAll();
+            }
+        },
+
+        cancelEdit() {
+            this.isEditing = false;
+        }
+    }));
+});
+
+// Logic Submit Form
+document.getElementById('mainForm').addEventListener('submit', function (e) {
+    const canvas = window.fabricCanvas;
+    if (canvas) {
+        // Cek apakah canvas kosong (memiliki objek atau tidak)
+        if (canvas.getObjects().length > 0) {
+            // Export ke format PNG dengan kualitas tinggi
+            const dataURL = canvas.toDataURL({
+                format: 'png',
+                quality: 1
+            });
+            document.getElementById('tanda_tangan_input').value = dataURL;
+        }
+    }
+});
+</script>
+@endpush
 @endsection

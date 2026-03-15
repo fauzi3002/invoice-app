@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-4xl mx-auto pb-10 print:pb-0 print:m-0 px-4 md:px-0">
+<div class="container mx-auto px-4 pt-20 md:pt-6 pb-24">
     
     {{-- Action Buttons --}}
     <div class="flex flex-col md:flex-row justify-between items-center mb-6 no-print gap-4">
@@ -10,28 +10,32 @@
             Kembali
         </a>
         
-        <div class="flex items-center gap-2">
-            <button onclick="window.print()" class="bg-white text-gray-700 border border-gray-200 px-6 py-2 rounded-lg font-bold hover:bg-gray-50 transition flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                Unduh PDF
+        <div class="flex items-center gap-3">
+            {{-- Tombol Cetak --}}
+            <button onclick="window.print()" class="bg-blue-900 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-blue-800 transition flex items-center gap-2 shadow-lg shadow-blue-100">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                </svg>
+                Cetak Invoice
             </button>
 
-            <button onclick="window.print()" class="bg-blue-900 text-white px-6 py-2 rounded-lg font-bold shadow-lg shadow-blue-200 hover:bg-blue-800 transition flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                Cetak Invoice
+            {{-- Tombol Download --}}
+            <button onclick="openDownloadModal('{{ asset('storage/struks/struk-'.$struk->id.'.pdf') }}')" class="bg-emerald-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-emerald-700 transition flex items-center gap-2 shadow-lg shadow-emerald-100">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+                Download PDF
             </button>
         </div>
     </div>
     
     {{-- Invoice Card --}}
-    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden print:border-none print:m-0 print:shadow-none">
-        {{-- Judul Invoice - SEKARANG IKUT TERCETAK --}}
+    <div id="invoice-card" class="bg-white rounded-lg border border-gray-200 overflow-hidden print:border-none print:m-0 print:shadow-none">
         <div class="bg-gray-50/50 border-b border-gray-100 py-4 print:bg-transparent print:border-gray-200">
             <h1 class="text-center text-sm font-black text-blue-900 uppercase tracking-[0.2em]">Invoice Pembayaran</h1>
         </div>
 
         <div class="p-6 md:p-12 print:p-4">
-            
             {{-- HEADER SECTION --}}
             <div class="flex justify-between items-start mb-8 print:mb-4">
                 <div class="flex-1">
@@ -116,8 +120,22 @@
 
             {{-- FOOTER --}}
             <div class="mt-16 flex justify-end print:mt-10">
-                <div class="text-center w-48">
-                    <p class="text-[9px] font-black text-gray-400 uppercase mb-16 print:mb-12">Hormat Kami,</p>
+                <div class="text-center w-48 relative">
+                    <p class="text-[9px] font-black text-gray-400 uppercase mb-4 print:mb-2">Hormat Kami,</p>
+                    
+                    {{-- Area Tanda Tangan --}}
+                    <div class="flex justify-center items-center h-24 mb-2">
+                        @if($toko->tanda_tangan)
+                            {{-- mix-blend-multiply agar background putih di ttd transparan menyatu dengan kertas --}}
+                            <img src="{{ asset('storage/'.$toko->tanda_tangan) }}" 
+                                class="max-h-24 w-auto object-contain mix-blend-multiply" 
+                                alt="Tanda Tangan">
+                        @else
+                            {{-- Space kosong jika ttd belum diatur --}}
+                            <div class="h-20"></div>
+                        @endif
+                    </div>
+
                     <div class="border-b border-gray-200 mb-1"></div>
                     <p class="text-xs font-black text-gray-800 uppercase print:text-[10px]">{{ $toko->nama_toko }}</p>
                 </div>
@@ -126,59 +144,98 @@
     </div>
 </div>
 
+{{-- MODAL DOWNLOAD --}}
+<div id="downloadModal" class="fixed inset-0 z-[99] hidden items-center justify-center p-4">
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="closeModal()"></div>
+    <div class="relative bg-white rounded-xl shadow-xl max-w-sm w-full overflow-hidden border border-gray-200 transform transition-all">
+        <div class="p-6 text-center">
+            <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">Simpan Struk</h3>
+            <p class="text-sm text-gray-500 mb-6">Silakan masukkan nama file sebelum mengunduh.</p>
+            <div class="mb-6">
+                <input type="text" id="customFileName" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 text-center">
+            </div>
+            <div class="flex gap-3">
+                <button type="button" onclick="closeModal()" class="flex-1 px-4 py-2.5 bg-gray-100 text-gray-600 rounded-lg text-sm font-bold hover:bg-gray-200 transition">Batal</button>
+                <button type="button" id="confirmDownload" class="flex-1 px-4 py-2.5 bg-blue-900 text-white rounded-lg text-sm font-bold hover:bg-blue-700 shadow-md transition active:scale-95">Download</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentFileUrl = '';
+
+    function openDownloadModal(url) {
+        currentFileUrl = url + '?t=' + new Date().getTime();
+        const modal = document.getElementById('downloadModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.getElementById('customFileName').value = "Struk_{{ $struk->nama_pelanggan }}_{{ date('dmY') }}";
+        setTimeout(() => document.getElementById('customFileName').focus(), 100);
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('downloadModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    document.getElementById('confirmDownload').addEventListener('click', function() {
+        const fileName = document.getElementById('customFileName').value || 'struk';
+        const link = document.createElement('a');
+        link.href = currentFileUrl;
+        link.download = fileName + ".pdf";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        closeModal();
+    });
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('downloadModal');
+        if (event.target == modal) closeModal();
+    }
+</script>
+
 <style>
 .logo-toko { max-height: 100px; width: auto; object-fit: contain; }
 
 @media print {
-    /* 1. Paksa SEMUA elemen memiliki background putih dan teks hitam */
+
+    @page {
+        size: A4;
+        margin: 1cm;
+    }
+
     html, body {
-        background-color: white !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-        margin: 0;
-        padding: 0;
+        background: white !important;
     }
 
     body * {
-        background-color: white !important;
+        background-color: transparent !important;
     }
 
-    /* 2. Sembunyikan elemen navigasi */
-    nav, aside, header, footer, .no-print, [role="navigation"] { 
+    #invoice-card {
+        background: white !important;
+    }
+
+    nav, aside, header, footer, .no-print, [role="navigation"], #downloadModal { 
         display: none !important; 
     }
 
-    /* 3. Hilangkan bayangan dan border abu-abu luar pada card */
-    .max-w-4xl {
-        max-width: 100% !important;
+    .container {
         width: 100% !important;
-        margin: 0 !important;
+        max-width: none !important;
         padding: 0 !important;
+        margin: 0 !important;
     }
 
-    .bg-white {
-        background-color: white !important;
-        box-shadow: none !important;
-        border: none !important;
-    }
-
-    /* 4. Pastikan area judul invoice tetap muncul tapi tanpa background abu-abu */
-    .bg-gray-50\/50 {
-        background-color: transparent !important;
-        border-bottom: 1px solid #e5e7eb !important;
-    }
-
-    /* 5. Atur margin kertas */
-    @page {
-        size: A4;
-        margin: 1.5cm;
-    }
-
-    /* 6. Perbaiki grid agar tidak berantakan saat diprint */
-    .grid {
-        display: flex !important;
-        justify-content: space-between !important;
-    }
 }
+
 </style>
 @endsection

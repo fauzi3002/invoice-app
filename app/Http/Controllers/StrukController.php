@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Struk;
 use App\Models\Produk;
 use App\Models\StrukItem;
 use App\Models\PengaturanToko;
 use App\Exports\StrukExport;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
@@ -16,6 +19,73 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class StrukController extends Controller
 {
+    // Tambahkan ini di dalam class StrukController
+        public function prepare($id)
+    {
+        $struk = Struk::findOrFail($id);
+        return view('buat_struk.whatsapp_prepare', compact('struk'));
+    }
+
+    public function whatsappSettings()
+    {
+        return view('buat_struk.whatsapp_settings'); // Sesuaikan folder view kamu
+    }
+
+    public function send(Request $request)
+    {
+        $struk = Struk::with('items.produk')->findOrFail($request->struk_id);
+        $pengaturanToko = PengaturanToko::first();
+
+        // A. Generate PDF (Agar file tersedia untuk dikirim)
+        $directory = storage_path('app/public/struks');
+        if (!file_exists($directory)) { mkdir($directory, 0777, true); }
+        
+        $pdf = Pdf::loadView('buat_struk.pdf', compact('struk', 'pengaturanToko'));
+        $fileName = 'struk-' . $struk->id . '.pdf';
+        $fullPath = $directory . DIRECTORY_SEPARATOR . $fileName;
+        file_put_contents($fullPath, $pdf->output());
+
+        // B. Kirim ke Robot Node.js
+        try {
+            $response = Http::post('http://localhost:3000/send-receipt', [
+                'phone'    => $request->phone, // Diambil dari input di halaman prepare
+                'message'  => $request->message,
+                'filePath' => $fullPath,
+            ]);
+
+
+            return redirect()->route('buat_struk.index')->with('success', 'Struk dalam proses pengiriman WhatsApp!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal terhubung ke Robot WhatsApp.');
+        }
+    }
+
+    public function generateOnly(Request $request)
+    {
+        $strukId = $request->struk_id;
+        $struk = Struk::with('items.produk')->findOrFail($strukId);
+        $pengaturanToko = PengaturanToko::first();
+
+        // Gunakan storage_path agar alamatnya absolut dan benar sejak awal
+        $directory = storage_path('app/public/struks');
+
+        // Jika folder belum ada, buat dengan izin penuh
+        if (!file_exists($directory)) {
+            mkdir($directory, 0777, true);
+        }
+
+        $pdf = Pdf::loadView('buat_struk.pdf', compact('struk', 'pengaturanToko'));
+        
+        $fileName = 'struk-' . $strukId . '.pdf';
+        // Gabungkan path menggunakan DIRECTORY_SEPARATOR agar aman di Windows
+        $fullPath = $directory . DIRECTORY_SEPARATOR . $fileName;
+
+        // Simpan file menggunakan file_put_contents sebagai alternatif Storage::put
+        file_put_contents($fullPath, $pdf->output());
+
+        return redirect()->back()->with('success', 'File tersimpan di: ' . $fullPath);
+    }
+
     public function index()
     {
         $struks = Struk::all();

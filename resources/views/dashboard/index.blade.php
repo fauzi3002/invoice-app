@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="pb-24 px-4 md:px-0 max-w-full mx-auto">
+<div class="container mx-auto px-4 pt-20 md:pt-6 pb-24">
     
     {{-- Header --}}
     <div class="mb-8">

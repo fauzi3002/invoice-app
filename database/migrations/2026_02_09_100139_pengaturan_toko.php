@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nama_toko');
             $table->string('logo_toko')->nullable();
+            $table->string('tanda_tangan');
             $table->string('no_telepon');
             $table->string('nama_bank');
             $table->string('no_rekening');

@@ -1,127 +1,193 @@
 @extends('layouts.app')
 
 @section('content')
-<div id="pageWrapper" class="pb-24 min-h-screen max-w-full mx-auto px-4">
-    <div class="mx-auto w-full max-w-4xl">
-        
-        {{-- HEADER SECTION --}}
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+<div id="pageWrapper" class="container mx-auto px-4 pt-24 md:pt-10 pb-24">
+    {{-- Header --}}
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800 tracking-tight">Tambah Produk</h2>
+            <p class="text-sm text-gray-500 mt-1">Lengkapi rincian produk untuk inventaris sistem Anda</p>
+        </div>
+    </div>
+
+    {{-- Pesan Error Global --}}
+    @if ($errors->any())
+        <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg flex items-start gap-3">
+            <svg class="w-5 h-5 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
             <div>
-                <h2 class="text-2xl font-bold text-gray-800 tracking-tight">Tambah Produk</h2>
-                <p class="text-sm text-gray-500 mt-1">Lengkapi detail produk untuk menambah koleksi inventaris Anda.</p>
+                <p class="font-bold text-sm">Ada kesalahan pada input Anda:</p>
+                <ul class="list-disc list-inside text-xs mt-1 opacity-90">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
         </div>
+    @endif
 
-        <form action="{{ route('produk.store') }}" method="POST" enctype="multipart/form-data">
-            @csrf
+    <form id="productForm" action="{{ route('produk.store') }}" 
+          enctype="multipart/form-data" 
+          method="POST" 
+          class="space-y-6">
+        @csrf
 
-            {{-- UPLOAD GAMBAR --}}
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 overflow-hidden">
-                <div class="p-4 border-b border-gray-200 bg-gray-50/50">
-                    <h2 class="text-sm font-bold text-gray-800 flex items-center gap-2 uppercase tracking-wider">
-                        <svg class="w-4 h-4 text-blue-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        Gambar Produk
-                    </h2>
-                </div>
-                
-                <div class="p-8 flex flex-col items-center justify-center" x-data="{ photoPreview: null }">
-                    <div class="relative group">
-                        <div @click="$refs.fileInput.click()" 
-                             class="w-44 h-44 rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden bg-white transition-all group-hover:border-blue-500 cursor-pointer relative">
-                            
-                            <template x-if="photoPreview">
-                                <img :src="photoPreview" class="w-full h-full object-cover">
-                            </template>
-                            
-                            <template x-if="!photoPreview">
-                                <div class="flex flex-col items-center p-4 text-center">
-                                    <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center mb-3">
-                                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                        </svg>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            {{-- Sidebar Kiri: Gambar Produk --}}
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-lg border border-gray-200 overflow-hidden sticky top-24">
+                    <div class="p-4 border-b border-gray-100 bg-gray-50/50">
+                        <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider">Gambar Produk</h3>
+                    </div>
+                    <div class="p-6 flex flex-col items-center" 
+                         x-data="{ photoPreview: null }">
+                        
+                        <div class="relative group w-44 h-44 mb-4">
+                            <div class="w-full h-full rounded-lg border-2 border-dashed {{ $errors->has('gambar') ? 'border-red-300' : 'border-gray-200' }} flex items-center justify-center overflow-hidden bg-gray-50 transition-all group-hover:border-blue-400">
+                                <template x-if="photoPreview">
+                                    <img :src="photoPreview" class="w-full h-full object-cover">
+                                </template>
+                                <template x-if="!photoPreview">
+                                    <div class="text-center p-2 text-gray-400">
+                                        <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                        <span class="text-[10px] font-bold uppercase tracking-widest">Belum Ada Foto</span>
                                     </div>
-                                    <span class="text-[11px] font-bold text-gray-500 uppercase tracking-tight">Pilih Foto</span>
+                                </template>
+                                
+                                <div @click="$refs.fileInput.click()" class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+                                    <span class="text-white text-xs font-bold uppercase tracking-widest">Upload Foto</span>
                                 </div>
-                            </template>
+                            </div>
                         </div>
 
-                        <template x-if="photoPreview">
-                            <button type="button" @click="photoPreview = null; $refs.fileInput.value = ''" 
-                                    class="absolute -top-2 -right-2 bg-red-600 text-white p-1.5 rounded-full shadow-lg hover:bg-red-700 transition">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                            </button>
-                        </template>
+                        <input type="file" name="gambar" x-ref="fileInput" accept="image/*" class="hidden"
+                               @change="const file = $event.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (e) => { photoPreview = e.target.result; }; reader.readAsDataURL(file); }">
+                        
+                        <div class="text-center">
+                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-relaxed">JPG, PNG, WEBP<br>Maksimal 2MB</p>
+                        </div>
                     </div>
+                </div>
+            </div>
 
-                    <input type="file" name="gambar" x-ref="fileInput" accept="image/*" class="hidden"
-                        @change="
-                            const file = $event.target.files[0];
-                            if (file) {
-                                const reader = new FileReader();
-                                reader.onload = (e) => { photoPreview = e.target.result; };
-                                reader.readAsDataURL(file);
-                            }
-                        ">
+            {{-- Kolom Kanan: Form Detail --}}
+            <div class="lg:col-span-2 space-y-6">
+                
+                {{-- Informasi Utama --}}
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <div class="p-5 border-b border-gray-100 flex items-center gap-3">
+                        <div class="p-2 bg-blue-50 rounded-lg">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                        </div>
+                        <h3 class="font-bold text-gray-800">Detail Produk</h3>
+                    </div>
                     
-                    <p class="mt-4 text-[10px] text-gray-400 uppercase font-bold tracking-widest">JPG, PNG, WEBP • MAX 2MB</p>
-                </div>
-            </div>
+                    <div class="p-6 space-y-5">
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-gray-600 uppercase">Nama Produk <span class="text-red-500">*</span></label>
+                            <input type="text" name="nama_produk" value="{{ old('nama_produk') }}" required
+                                   placeholder="Contoh: Kertas A4 80gsm"
+                                   class="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition text-sm">
+                        </div>
 
-            {{-- FORM INFORMASI --}}
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-8 overflow-hidden">
-                <div class="p-4 border-b border-gray-200 bg-gray-50/50">
-                    <h2 class="text-sm font-bold text-gray-800 flex items-center gap-2 uppercase tracking-wider">
-                        <svg class="w-4 h-4 text-blue-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                        Informasi Produk
-                    </h2>
-                </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-gray-600 uppercase">Jumlah Stok <span class="text-red-500">*</span></label>
+                                <input type="number" name="stok" value="{{ old('stok', 0) }}" required
+                                       class="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition text-sm">
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-gray-600 uppercase">Harga Satuan <span class="text-red-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 font-bold text-sm">Rp</span>
+                                    {{-- Input Visual --}}
+                                    <input id="rupiah_visual" type="text" required
+                                           class="w-full pl-11 pr-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition text-sm font-bold"
+                                           placeholder="0">
+                                    {{-- Input Asli untuk Database --}}
+                                    <input type="hidden" name="harga_satuan" id="harga_satuan_asli" value="{{ old('harga_satuan') }}">
+                                </div>
+                            </div>
+                        </div>
 
-                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="md:col-span-2 space-y-1.5">
-                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Nama Produk</label>
-                        <input type="text" name="nama_produk" required
-                               class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition"
-                               placeholder="Contoh: Kertas A4 80gsm">
-                    </div>
-
-                    <div class="space-y-1.5">
-                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Jumlah Stok</label>
-                        <input type="number" name="stok" required
-                               class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition"
-                               placeholder="0">
-                    </div>
-
-                    <div class="space-y-1.5">
-                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Harga Satuan</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 text-sm font-bold">Rp</span>
-                            <input type="number" name="harga_satuan" required
-                                   class="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition"
-                                   placeholder="0">
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-gray-600 uppercase">Deskripsi (Opsional)</label>
+                            <textarea name="deskripsi" rows="4" 
+                                      placeholder="Tambahkan spesifikasi atau catatan produk..."
+                                      class="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition text-sm resize-none tracking-wide leading-relaxed">{{ old('deskripsi') }}</textarea>
                         </div>
                     </div>
+                </div>
 
-                    <div class="md:col-span-2 space-y-1.5">
-                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Deskripsi Produk (Opsional)</label>
-                        <textarea name="deskripsi" rows="3" 
-                                  class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition resize-none"
-                                  placeholder="Tambahkan catatan atau spesifikasi produk..."></textarea>
-                    </div>
+                {{-- Action Buttons --}}
+                <div class="flex items-center justify-end gap-3 pt-2">
+                    <a href="{{ route('produk.index') }}" 
+                       class="px-6 py-2.5 text-sm font-bold text-gray-500 hover:text-gray-700 transition">
+                        Batal
+                    </a>
+                    <button id="btnSubmitProduct" type="submit" 
+                            class="px-10 py-3 bg-blue-900 text-white rounded-lg text-sm font-bold shadow-lg hover:bg-blue-800 focus:ring-4 focus:ring-blue-900/20 transition-all active:scale-95">
+                        Simpan Produk
+                    </button>
                 </div>
             </div>
-
-            {{-- ACTION BUTTONS --}}
-            <div class="flex items-center justify-end gap-3">
-                <a href="{{ route('produk.index') }}" 
-                   class="px-6 py-2.5 bg-white border border-gray-200 text-gray-600 rounded-lg text-sm font-bold hover:bg-gray-50 transition">
-                    Batal
-                </a>
-                <button type="submit" 
-                        class="px-8 py-2.5 bg-blue-900 text-white rounded-lg text-sm font-bold shadow-md shadow-blue-900/10 hover:bg-blue-800 transition active:scale-95">
-                    Simpan Produk
-                </button>
-            </div>
-        </form>
-    </div>
+        </div>
+    </form>
 </div>
+
+<script>
+    const visual = document.getElementById('rupiah_visual');
+    const asli = document.getElementById('harga_satuan_asli');
+
+    // Jika ada old value (setelah validasi gagal), format kembali tampilannya
+    if(asli.value) {
+        visual.value = formatRupiah(asli.value);
+    }
+
+    visual.addEventListener('keyup', function(e) {
+        this.value = formatRupiah(this.value);
+        asli.value = cleanNumber(this.value);
+    });
+
+    function formatRupiah(angka) {
+        let number_string = angka.toString().replace(/[^,\d]/g, ''),
+            split = number_string.split(','),
+            sisa = split[0].length % 3,
+            rupiah = split[0].substr(0, sisa),
+            ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+        if (ribuan) {
+            let separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+
+        return split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
+    }
+
+    // --- Proteksi Submit & Loading ---
+    const productForm = document.getElementById('productForm');
+    const btnSubmit = document.getElementById('btnSubmitProduct');
+
+    if (productForm && btnSubmit) {
+        productForm.onsubmit = function() {
+            // Cek validasi HTML5 bawaan (required fields)
+            if (!productForm.checkValidity()) {
+                return true; // Biarkan browser menunjukkan field mana yang kosong
+            }
+
+            // Tambahkan class loading (spinner)
+            btnSubmit.classList.add('btn-loading');
+            
+            // Disable tombol agar tidak diklik dua kali
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = 'Menyimpan...'; // Opsional: Ubah teks tombol
+            
+            return true;
+        };
+    }
+
+    function cleanNumber(value) {
+        return value.replace(/\./g, '') || 0;
+    }
+</script>
 @endsection
